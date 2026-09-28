@@ -26,18 +26,18 @@ def style(ax, title):
 def plot_implied_vs_realized(vix, forward_realized_vol, path=None):
     fig, (top, bottom) = plt.subplots(2, 1, figsize=(11, 7), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
     implied = vix / 100
-    top.plot(implied.index, implied, color=PALETTE[0], lw=0.8, label="VIX (30-day implied)")
-    top.plot(forward_realized_vol.index, forward_realized_vol, color=PALETTE[1], lw=0.8, label="Next 21-day realized")
+    top.plot(implied.index, implied, color=PALETTE[0], lw=0.8, label="Priced in by the market (VIX, next 30 days)")
+    top.plot(forward_realized_vol.index, forward_realized_vol, color=PALETTE[1], lw=0.8, label="What the index then delivered (next 21 trading days)")
     top.legend(frameon=False)
     top.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    style(top, "S&P 500: implied vs subsequently realized volatility")
+    style(top, "Volatility the market priced in, against the volatility the S&P 500 then delivered")
 
     spread = (implied - forward_realized_vol).dropna()
     bottom.fill_between(spread.index, 0, spread, where=spread >= 0, color=PALETTE[2], alpha=0.6, lw=0)
     bottom.fill_between(spread.index, 0, spread, where=spread < 0, color=PALETTE[1], alpha=0.6, lw=0)
     bottom.axhline(0, color="black", lw=0.6)
     bottom.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    style(bottom, f"Implied minus realized (positive {100 * (spread > 0).mean():.0f}% of days)")
+    style(bottom, f"Priced in minus delivered: the market charged more than it got on {100 * (spread > 0).mean():.0f}% of days")
     return _finish(fig, path)
 
 

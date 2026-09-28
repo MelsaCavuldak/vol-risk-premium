@@ -26,11 +26,11 @@ The evaluation window is **January 2020 to September 2026** (1,692 trading days,
 
 | notebook | question |
 |---|---|
-| [01_implied_vs_realized](01_implied_vs_realized.ipynb) | How large is the VIX premium, year by year, and does it persist? |
-| [02_forecasting](02_forecasting.ipynb) | Do HAR, HAR-X and GARCH forecast realized variance better than the VIX? |
-| [03_pricing_and_hedging](03_pricing_and_hedging.ipynb) | How does a delta-hedged short straddle work, shown on a good and a bad trade? |
-| [04_backtest](04_backtest.ipynb) | What does the strategy earn, where does the P&L come from, and what does the filter change? |
-| [05_tail_risk_and_robustness](05_tail_risk_and_robustness.ipynb) | Tail risk, stress episodes, sensitivity to assumptions, and how much of the Sharpe ratio is luck? |
+| [01_implied_vs_realized](01_implied_vs_realized.ipynb) | How much more volatility does the market price in than the index then delivers, year by year, and does that gap last? |
+| [02_forecasting](02_forecasting.ipynb) | Does a statistical model forecast realized variance better than the market's own forecast, the VIX? |
+| [03_pricing_and_hedging](03_pricing_and_hedging.ipynb) | How does a delta-hedged short straddle earn when the index stays calm and lose when it moves, shown on a good and a bad trade? |
+| [04_backtest](04_backtest.ipynb) | What does the strategy earn with the hedge, without it and with a forecast filter, and where does its P&L come from? |
+| [05_tail_risk_and_robustness](05_tail_risk_and_robustness.ipynb) | How much of the result survives the costs, the assumptions and the Covid crash, and how much of the Sharpe ratio is luck? |
 
 ## Main findings
 
@@ -55,7 +55,7 @@ The numbers come from the notebooks and from the run stored in [`results/`](resu
 
 Returns are measured on a fixed capital of 1,000,000 with a notional equal to capital, and the P&L is not compounded. The other tables (forecast evaluation, sensitivity, stress episodes) are in the notebooks and in [`results/summary.md`](results/summary.md).
 
-![Implied vs realized](results/figures/implied_vs_realized.png)
+![Volatility priced in by the market, against the volatility the index then delivered](results/figures/implied_vs_realized.png)
 ![Equity curves](results/figures/equity_curves.png)
 ![P&L attribution](results/figures/pnl_attribution.png)
 ![Return distribution](results/figures/return_distribution.png)
