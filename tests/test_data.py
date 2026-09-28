@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from vrp.data import load_market_data
-from vrp.report import markdown_table
+from vrp.report import as_percent, markdown_table
 
 
 def write_prices(path, values, adjusted=False):
@@ -64,3 +64,11 @@ def test_cache_is_refreshed_when_it_starts_too_late(tmp_path, monkeypatch):
     load_market_data("yahoo", "2024-03-01", cache=cache)
     load_market_data("yahoo", "2023-01-02", cache=cache)
     assert calls == ["2024-03-01", "2023-01-02"]
+
+
+def test_as_percent_scales_and_renames():
+    frame = pd.DataFrame({"a": [0.123456, -0.5], "b": [1.0, 2.0]})
+    out = as_percent(frame, ["a"], digits=1)
+    assert list(out.columns) == ["a (%)", "b"]
+    assert out["a (%)"].tolist() == [12.3, -50.0]
+    assert frame["a"].iloc[0] == 0.123456

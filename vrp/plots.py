@@ -1,7 +1,3 @@
-import matplotlib
-
-matplotlib.use("Agg")
-
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
@@ -12,34 +8,40 @@ from .metrics import drawdown
 PALETTE = ["#1f4e79", "#c0504d", "#4f8f4f", "#8064a2", "#d08a2e", "#4bacc6"]
 
 
-def _style(ax, title):
+def _finish(fig, path):
+    fig.tight_layout()
+    if path is not None:
+        fig.savefig(path, dpi=150)
+    plt.close(fig)
+    return fig
+
+
+def style(ax, title):
     ax.set_title(title, loc="left", fontsize=11, fontweight="bold")
     ax.grid(alpha=0.25)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
 
 
-def plot_implied_vs_realized(vix, forward_realized_vol, path):
+def plot_implied_vs_realized(vix, forward_realized_vol, path=None):
     fig, (top, bottom) = plt.subplots(2, 1, figsize=(11, 7), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
     implied = vix / 100
     top.plot(implied.index, implied, color=PALETTE[0], lw=0.8, label="VIX (30-day implied)")
     top.plot(forward_realized_vol.index, forward_realized_vol, color=PALETTE[1], lw=0.8, label="Next 21-day realized")
     top.legend(frameon=False)
     top.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    _style(top, "S&P 500: implied vs subsequently realized volatility")
+    style(top, "S&P 500: implied vs subsequently realized volatility")
 
     spread = (implied - forward_realized_vol).dropna()
     bottom.fill_between(spread.index, 0, spread, where=spread >= 0, color=PALETTE[2], alpha=0.6, lw=0)
     bottom.fill_between(spread.index, 0, spread, where=spread < 0, color=PALETTE[1], alpha=0.6, lw=0)
     bottom.axhline(0, color="black", lw=0.6)
     bottom.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    _style(bottom, f"Implied minus realized (positive {100 * (spread > 0).mean():.0f}% of days)")
-    fig.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
+    style(bottom, f"Implied minus realized (positive {100 * (spread > 0).mean():.0f}% of days)")
+    return _finish(fig, path)
 
 
-def plot_equity(returns_by_strategy, path):
+def plot_equity(returns_by_strategy, path=None):
     fig, (top, bottom) = plt.subplots(2, 1, figsize=(11, 7), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
     for color, (label, returns) in zip(PALETTE, returns_by_strategy.items()):
         top.plot(returns.index, returns.cumsum(), color=color, lw=1.0, label=label)
@@ -48,14 +50,12 @@ def plot_equity(returns_by_strategy, path):
     top.legend(frameon=False, fontsize=9)
     top.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
     bottom.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    _style(top, "Cumulative P&L (% of capital, non-compounded)")
-    _style(bottom, "Drawdown")
-    fig.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
+    style(top, "Cumulative P&L (% of capital, non-compounded)")
+    style(bottom, "Drawdown")
+    return _finish(fig, path)
 
 
-def plot_attribution(daily, capital, path):
+def plot_attribution(daily, capital, path=None):
     fig, ax = plt.subplots(figsize=(11, 4.5))
     parts = {
         "Gamma / theta": daily["gamma_theta_pnl"],
@@ -68,13 +68,11 @@ def plot_attribution(daily, capital, path):
     ax.axhline(0, color="black", lw=0.6)
     ax.legend(frameon=False, fontsize=9)
     ax.yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    _style(ax, "P&L attribution of the delta-hedged short straddle")
-    fig.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
+    style(ax, "P&L attribution of the delta-hedged short straddle")
+    return _finish(fig, path)
 
 
-def plot_return_distribution(returns, path):
+def plot_return_distribution(returns, path=None):
     r = returns[returns != 0].dropna()
     fig, ax = plt.subplots(figsize=(11, 4.5))
     bins = np.linspace(r.min(), r.max(), 80)
@@ -88,7 +86,5 @@ def plot_return_distribution(returns, path):
     ax.set_ylabel("Number of days")
     ax.legend(frameon=False, fontsize=9, loc="upper left")
     ax.xaxis.set_major_formatter(mticker.PercentFormatter(1.0))
-    _style(ax, "Distribution of daily returns (log scale)")
-    fig.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
+    style(ax, "Distribution of daily returns (log scale)")
+    return _finish(fig, path)

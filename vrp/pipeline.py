@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -133,6 +134,7 @@ def build_report(spx, sample, vrp_stats, forecast_eval, summary, sensitivity, st
 
 def main(argv=None):
     args = parse_args(argv)
+    plt.switch_backend("Agg")
     out = Path(args.out)
     figures = out / "figures"
     figures.mkdir(parents=True, exist_ok=True)
