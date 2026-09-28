@@ -2,7 +2,7 @@
 
 S&P 500 options are usually priced at an implied volatility above the volatility the index then delivers. This project measures that gap over 2020-2026, tests whether it can be forecast, and backtests a delta-hedged short straddle that tries to collect it, with the emphasis on what happens in the tails.
 
-The analysis is laid out as five notebooks with their results and charts already in place, so everything can be read directly on GitHub. The reusable code sits in a small tested package, `vrp/`.
+The analysis is laid out as five notebooks with their results and charts already in place, so everything can be read directly on GitHub, plus a sixth that recomputes the key figures in SQL as a cross-check. The reusable code sits in a small tested package, `vrp/`.
 
 ## Why this project
 
@@ -31,6 +31,7 @@ The evaluation window is **January 2020 to September 2026** (1,692 trading days,
 | [03_pricing_and_hedging](03_pricing_and_hedging.ipynb) | How does a delta-hedged short straddle earn when the index stays calm and lose when it moves, shown on a good and a bad trade? |
 | [04_backtest](04_backtest.ipynb) | What does the strategy earn with the hedge, without it and with a forecast filter, and where does its P&L come from? |
 | [05_tail_risk_and_robustness](05_tail_risk_and_robustness.ipynb) | How much of the result survives the costs, the assumptions and the Covid crash, and how much of the Sharpe ratio is luck? |
+| [06_same_numbers_in_sql](06_same_numbers_in_sql.ipynb) | Do the key figures come out the same when recomputed independently in SQL? |
 
 ## Main findings
 
@@ -88,6 +89,8 @@ Forecasts are compared with RMSE, QLIKE (robust to noise in the realized varianc
 
 **Evaluation.** Sharpe, Sortino, maximum drawdown, skew, VaR and CVaR, worst month, ten stress episodes from the Covid crash to March 2026, and the Probabilistic and Deflated Sharpe Ratios (Bailey and López de Prado, 2012, 2014), which account for fat tails and for the five variants tested.
 
+**Cross-check in SQL.** The forward realized variance, the premium summary and its yearly table, the trade statistics and the stress windows are also written as queries in `sql/` and run on DuckDB. They agree with the Python results to about 4e-13, and unit tests enforce it. The model fits, the pricing and the backtest loop stay in Python, since they are numerical rather than tabular.
+
 ## Limitations
 
 - The VIX is a proxy for ATM implied vol, not a traded price. The sensitivity analysis shows how much the result depends on that spread; it is the largest single driver of the backtest.
@@ -106,6 +109,8 @@ Forecasts are compared with RMSE, QLIKE (robust to noise in the realized varianc
 03_pricing_and_hedging.ipynb
 04_backtest.ipynb
 05_tail_risk_and_robustness.ipynb
+06_same_numbers_in_sql.ipynb
+sql/              the queries behind notebook 06, one file per question
 vrp/
   data.py         market data download, caching and CSV loading
   volatility.py   realized variance, HAR and GARCH walk-forward forecasts, forecast evaluation
@@ -114,8 +119,9 @@ vrp/
   metrics.py      performance, tail risk, PSR / DSR, stress episodes
   plots.py        figures
   report.py       markdown tables
+  sql.py          loads the data into DuckDB and runs the queries of sql/
   pipeline.py     command-line entry point that ties the steps together
-tests/            pricing vs finite differences, no look-ahead, backtest invariants, data loading
+tests/            pricing vs finite differences, no look-ahead, backtest invariants, data loading, SQL vs Python
 results/          tables, trade list and figures from the command-line run
 run.py            shortcut for `python -m vrp`
 ```
