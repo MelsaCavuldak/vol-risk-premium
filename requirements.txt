@@ -4,4 +4,5 @@ scipy>=1.10
 matplotlib>=3.7
 arch>=6.2
 yfinance>=0.2.40
+duckdb>=1.0
 pytest>=7.4
